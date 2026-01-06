@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 import { 
   Heart, 
@@ -55,34 +56,38 @@ interface CategorySelectorProps {
   onChange: (category: HabitCategory) => void;
 }
 
-// Category selector for forms
-export function CategorySelector({ value, onChange }: CategorySelectorProps) {
-  return (
-    <div className="flex flex-wrap gap-2">
-      {(Object.keys(HABIT_CATEGORIES) as HabitCategory[]).map((cat) => {
-        const config = HABIT_CATEGORIES[cat];
-        const Icon = config.icon;
-        const isSelected = value === cat;
+// Category selector for forms - wrapped with forwardRef for FormControl compatibility
+export const CategorySelector = forwardRef<HTMLDivElement, CategorySelectorProps>(
+  ({ value, onChange }, ref) => {
+    return (
+      <div ref={ref} className="flex flex-wrap gap-2">
+        {(Object.keys(HABIT_CATEGORIES) as HabitCategory[]).map((cat) => {
+          const config = HABIT_CATEGORIES[cat];
+          const Icon = config.icon;
+          const isSelected = value === cat;
 
-        return (
-          <button
-            key={cat}
-            type="button"
-            onClick={() => onChange(cat)}
-            className={cn(
-              'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all',
-              config.bgColor,
-              isSelected ? cn(config.color, 'ring-2 ring-offset-2 ring-offset-background', config.color.replace('text-', 'ring-')) : 'text-muted-foreground hover:text-foreground'
-            )}
-          >
-            <Icon className="h-4 w-4" />
-            {config.label}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
+          return (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => onChange(cat)}
+              className={cn(
+                'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all',
+                config.bgColor,
+                isSelected ? cn(config.color, 'ring-2 ring-offset-2 ring-offset-background', config.color.replace('text-', 'ring-')) : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              <Icon className="h-4 w-4" />
+              {config.label}
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+);
+
+CategorySelector.displayName = 'CategorySelector';
 
 interface CategoryFilterProps {
   selected: HabitCategory | 'all';
