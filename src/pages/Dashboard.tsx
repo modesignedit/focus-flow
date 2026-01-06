@@ -1,8 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { FocusTimer } from '@/components/FocusTimer';
 import { HabitList } from '@/components/HabitList';
 import { WeeklyChart } from '@/components/WeeklyChart';
+import { FocusHistory } from '@/components/FocusHistory';
+import { StreakDisplay } from '@/components/StreakDisplay';
+import { ReminderSettings } from '@/components/ReminderSettings';
+import { OnboardingFlow } from '@/components/onboarding/OnboardingFlow';
 import { AchievementsButton, AchievementsPanel } from '@/components/achievements/AchievementsPanel';
 import { AchievementNotification } from '@/components/achievements/AchievementNotification';
 import { useHabits } from '@/hooks/useHabits';
@@ -15,6 +19,15 @@ import { format } from 'date-fns';
 export default function Dashboard() {
   const today = format(new Date(), 'EEEE, MMMM d');
   const [showAchievements, setShowAchievements] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  
+  // Check if user needs onboarding
+  useEffect(() => {
+    const completed = localStorage.getItem('onboarding_complete');
+    if (!completed) {
+      setShowOnboarding(true);
+    }
+  }, []);
   
   // Get data for achievements
   const { habits } = useHabits();
@@ -38,6 +51,11 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      
+      {/* Onboarding for new users */}
+      {showOnboarding && (
+        <OnboardingFlow onComplete={() => setShowOnboarding(false)} />
+      )}
       
       {/* Achievement notification */}
       <AchievementNotification 
@@ -66,9 +84,20 @@ export default function Dashboard() {
           <FocusTimer />
         </section>
 
+        {/* Streak and reminders row */}
+        <section className="grid sm:grid-cols-2 gap-4">
+          <StreakDisplay />
+          <ReminderSettings />
+        </section>
+
         {/* Weekly progress chart */}
         <section>
           <WeeklyChart />
+        </section>
+
+        {/* Focus session history */}
+        <section>
+          <FocusHistory />
         </section>
 
         {/* Habits list */}
