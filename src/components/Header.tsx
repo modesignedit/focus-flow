@@ -2,6 +2,7 @@ import { LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from './ThemeToggle';
 import { useAuth } from '@/contexts/AuthContext';
+import { Logo } from '@/components/auth/Logo';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,14 +21,8 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full glass">
-      <div className="container flex h-14 items-center justify-between">
-        {/* Logo */}
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm">F</span>
-          </div>
-          <span className="font-semibold text-lg hidden sm:inline">FocusFlow</span>
-        </div>
+      <div className="container flex h-16 items-center justify-between">
+        <Logo size="sm" />
 
         {/* Right side actions */}
         <div className="flex items-center gap-2">
