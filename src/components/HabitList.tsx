@@ -165,21 +165,25 @@ export function HabitList() {
       {/* Habit cards with smart scroll */}
       {filteredHabits.length > 0 && (
         filteredHabits.length > 4 ? (
-          <ScrollArea className="h-[400px] pr-3">
-            <div className="space-y-3 pb-2">
-              {filteredHabits.map(habit => (
-                <HabitCard
-                  key={habit.id}
-                  habit={habit}
-                  streak={getHabitStreak(habit.id)}
-                  onToggle={() => handleToggle(habit.id)}
-                  onEdit={() => openEditDialog(habit)}
-                  onDelete={() => handleDelete(habit.id)}
-                  onCelebrate={() => celebrate({ sound: 'complete' })}
-                />
-              ))}
-            </div>
-          </ScrollArea>
+          <div className="relative">
+            <ScrollArea className="h-[400px] pr-3">
+              <div className="space-y-3 pb-6">
+                {filteredHabits.map(habit => (
+                  <HabitCard
+                    key={habit.id}
+                    habit={habit}
+                    streak={getHabitStreak(habit.id)}
+                    onToggle={() => handleToggle(habit.id)}
+                    onEdit={() => openEditDialog(habit)}
+                    onDelete={() => handleDelete(habit.id)}
+                    onCelebrate={() => celebrate({ sound: 'complete' })}
+                  />
+                ))}
+              </div>
+            </ScrollArea>
+            {/* Fade gradient indicator */}
+            <div className="absolute bottom-0 left-0 right-3 h-12 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+          </div>
         ) : (
           <div className="space-y-3">
             {filteredHabits.map(habit => (
