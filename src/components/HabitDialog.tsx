@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/form';
 import { Habit } from '@/hooks/useHabits';
 import { cn } from '@/lib/utils';
+import { CategorySelector, HabitCategory } from './habits/HabitCategories';
 
 // Habit colors matching design system
 const HABIT_COLORS = [
@@ -36,6 +37,7 @@ const habitSchema = z.object({
   title: z.string().min(1, 'Title is required').max(100, 'Title too long'),
   description: z.string().max(500, 'Description too long').optional(),
   color: z.string(),
+  category: z.string(),
 });
 
 type HabitFormData = z.infer<typeof habitSchema>;
@@ -45,16 +47,18 @@ interface HabitDialogProps {
   onOpenChange: (open: boolean) => void;
   habit?: Habit | null;
   onSubmit: (data: HabitFormData) => void;
+  defaultValues?: Partial<HabitFormData>;
 }
 
 // Dialog for creating/editing habits
-export function HabitDialog({ open, onOpenChange, habit, onSubmit }: HabitDialogProps) {
+export function HabitDialog({ open, onOpenChange, habit, onSubmit, defaultValues }: HabitDialogProps) {
   const form = useForm<HabitFormData>({
     resolver: zodResolver(habitSchema),
     defaultValues: {
       title: '',
       description: '',
       color: HABIT_COLORS[0].value,
+      category: 'personal',
     },
   });
 
@@ -62,12 +66,13 @@ export function HabitDialog({ open, onOpenChange, habit, onSubmit }: HabitDialog
   useEffect(() => {
     if (open) {
       form.reset({
-        title: habit?.title || '',
-        description: habit?.description || '',
-        color: habit?.color || HABIT_COLORS[0].value,
+        title: defaultValues?.title || habit?.title || '',
+        description: defaultValues?.description || habit?.description || '',
+        color: defaultValues?.color || habit?.color || HABIT_COLORS[0].value,
+        category: defaultValues?.category || habit?.category || 'personal',
       });
     }
-  }, [open, habit, form]);
+  }, [open, habit, form, defaultValues]);
 
   const handleSubmit = (data: HabitFormData) => {
     onSubmit(data);
@@ -114,6 +119,22 @@ export function HabitDialog({ open, onOpenChange, habit, onSubmit }: HabitDialog
                     />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <FormControl>
+                    <CategorySelector
+                      value={field.value as HabitCategory}
+                      onChange={field.onChange}
+                    />
+                  </FormControl>
                 </FormItem>
               )}
             />

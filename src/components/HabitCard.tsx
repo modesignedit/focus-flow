@@ -14,6 +14,7 @@ import { HabitWithCompletions } from '@/hooks/useHabits';
 import { cn } from '@/lib/utils';
 import { Confetti } from './celebrations/Confetti';
 import { StreakCounter } from './celebrations/StreakCounter';
+import { CategoryBadge } from './habits/HabitCategories';
 
 interface HabitCardProps {
   habit: HabitWithCompletions;
@@ -98,13 +99,14 @@ export function HabitCard({ habit, streak, onToggle, onEdit, onDelete, onCelebra
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <h3 className={cn(
                       "font-medium transition-all",
                       isComplete && "line-through text-muted-foreground"
                     )}>
                       {habit.title}
                     </h3>
+                    <CategoryBadge category={habit.category} />
                     <StreakCounter streak={streak} />
                   </div>
                   {habit.description && (

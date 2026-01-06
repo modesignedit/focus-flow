@@ -3,6 +3,8 @@ import { Plus, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { HabitCard } from './HabitCard';
 import { HabitDialog } from './HabitDialog';
+import { CategoryFilter, HabitCategory } from './habits/HabitCategories';
+import { HabitTemplates } from './habits/HabitTemplates';
 import { useHabits, Habit } from '@/hooks/useHabits';
 import { useStreak } from '@/hooks/useStreak';
 import { useCelebration } from '@/hooks/useCelebration';
@@ -17,20 +19,23 @@ export function HabitList() {
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<HabitCategory | 'all'>('all');
+  const [templateDefaults, setTemplateDefaults] = useState<{ title: string; description: string; category: HabitCategory; color: string } | null>(null);
 
-  const handleCreate = async (data: { title: string; description?: string; color: string }) => {
-    const { error } = await createHabit(data.title, data.description, data.color);
+  const handleCreate = async (data: { title: string; description?: string; color: string; category?: string }) => {
+    const { error } = await createHabit(data.title, data.description, data.color, data.category as HabitCategory);
     if (error) {
       toast({ title: 'Error', description: error, variant: 'destructive' });
     } else {
       toast({ title: 'Habit created', description: 'Good luck with your new goal!' });
       setDialogOpen(false);
+      setTemplateDefaults(null);
     }
   };
 
-  const handleUpdate = async (data: { title: string; description?: string; color: string }) => {
+  const handleUpdate = async (data: { title: string; description?: string; color: string; category?: string }) => {
     if (!editingHabit) return;
-    const { error } = await updateHabit(editingHabit.id, data);
+    const { error } = await updateHabit(editingHabit.id, { ...data, category: data.category as HabitCategory });
     if (error) {
       toast({ title: 'Error', description: error, variant: 'destructive' });
     } else {
@@ -58,13 +63,26 @@ export function HabitList() {
 
   const openEditDialog = (habit: Habit) => {
     setEditingHabit(habit);
+    setTemplateDefaults(null);
     setDialogOpen(true);
   };
 
   const closeDialog = () => {
     setDialogOpen(false);
     setEditingHabit(null);
+    setTemplateDefaults(null);
   };
+
+  const handleSelectTemplate = (template: { title: string; description: string; category: HabitCategory; color: string }) => {
+    setTemplateDefaults(template);
+    setEditingHabit(null);
+    setDialogOpen(true);
+  };
+
+  // Filter habits by category
+  const filteredHabits = selectedCategory === 'all' 
+    ? habits 
+    : habits.filter(h => h.category === selectedCategory);
 
   // Calculate today's completion stats
   const todayStats = habits.reduce(
@@ -88,7 +106,7 @@ export function HabitList() {
   return (
     <div className="space-y-4">
       {/* Header with stats */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <h2 className="text-lg font-semibold">Today's Habits</h2>
           {habits.length > 0 && (
@@ -97,11 +115,22 @@ export function HabitList() {
             </p>
           )}
         </div>
-        <Button onClick={() => setDialogOpen(true)} size="sm" className="gap-1.5">
-          <Plus className="h-4 w-4" />
-          Add
-        </Button>
+        <div className="flex gap-2">
+          <HabitTemplates 
+            onSelectTemplate={handleSelectTemplate}
+            existingHabitTitles={habits.map(h => h.title)}
+          />
+          <Button onClick={() => { setTemplateDefaults(null); setDialogOpen(true); }} size="sm" className="gap-1.5">
+            <Plus className="h-4 w-4" />
+            Add
+          </Button>
+        </div>
       </div>
+
+      {/* Category filter */}
+      {habits.length > 0 && (
+        <CategoryFilter selected={selectedCategory} onChange={setSelectedCategory} />
+      )}
 
       {/* Empty state */}
       {habits.length === 0 && (
@@ -113,16 +142,29 @@ export function HabitList() {
           <p className="text-sm text-muted-foreground mb-4">
             Start building your daily routine
           </p>
-          <Button onClick={() => setDialogOpen(true)} variant="outline">
-            <Plus className="h-4 w-4 mr-2" />
-            Create your first habit
-          </Button>
+          <div className="flex gap-2 justify-center">
+            <HabitTemplates 
+              onSelectTemplate={handleSelectTemplate}
+              existingHabitTitles={[]}
+            />
+            <Button onClick={() => setDialogOpen(true)} variant="outline">
+              <Plus className="h-4 w-4 mr-2" />
+              Create custom
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* No habits in category */}
+      {habits.length > 0 && filteredHabits.length === 0 && (
+        <div className="py-8 text-center text-muted-foreground">
+          No habits in this category
         </div>
       )}
 
       {/* Habit cards */}
       <div className="space-y-3">
-        {habits.map(habit => (
+        {filteredHabits.map(habit => (
           <HabitCard
             key={habit.id}
             habit={habit}
@@ -141,6 +183,7 @@ export function HabitList() {
         onOpenChange={closeDialog}
         habit={editingHabit}
         onSubmit={editingHabit ? handleUpdate : handleCreate}
+        defaultValues={templateDefaults || undefined}
       />
     </div>
   );
