@@ -1,8 +1,9 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, X } from 'lucide-react';
+import { Trophy, X, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { AchievementBadge, Achievement } from './AchievementBadge';
+import { ShareButton } from '@/components/sharing/ShareableCard';
 import { cn } from '@/lib/utils';
 
 interface AchievementsPanelProps {
@@ -75,11 +76,22 @@ export function AchievementsPanel({ achievements, isOpen, onClose }: Achievement
                       </h3>
                       <div className="flex flex-wrap gap-3">
                         {items.map((achievement) => (
-                          <AchievementBadge
-                            key={achievement.id}
-                            achievement={achievement}
-                            size="md"
-                          />
+                          <div key={achievement.id} className="relative group">
+                            <AchievementBadge
+                              achievement={achievement}
+                              size="md"
+                            />
+                            {achievement.unlocked && (
+                              <div className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <ShareButton 
+                                  type="achievement" 
+                                  achievement={achievement}
+                                  variant="outline"
+                                  size="icon"
+                                />
+                              </div>
+                            )}
+                          </div>
                         ))}
                       </div>
                     </div>

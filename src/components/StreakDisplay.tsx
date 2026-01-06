@@ -2,6 +2,7 @@ import { Flame, TrendingUp } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { useHabits } from '@/hooks/useHabits';
 import { useStreak } from '@/hooks/useStreak';
+import { ShareButton } from '@/components/sharing/ShareableCard';
 
 // Display overall streak and individual habit streaks
 export function StreakDisplay() {
@@ -12,17 +13,22 @@ export function StreakDisplay() {
 
   return (
     <Card className="p-4 glass animate-fade-in">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="p-2 rounded-full bg-orange-500/10">
-          <Flame className="h-5 w-5 text-orange-500" />
-        </div>
-        <div>
-          <div className="text-2xl font-bold flex items-center gap-1">
-            {overallStreak}
-            <span className="text-sm font-normal text-muted-foreground">day streak</span>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-full bg-orange-500/10">
+            <Flame className="h-5 w-5 text-orange-500" />
           </div>
-          <p className="text-xs text-muted-foreground">All habits completed</p>
+          <div>
+            <div className="text-2xl font-bold flex items-center gap-1">
+              {overallStreak}
+              <span className="text-sm font-normal text-muted-foreground">day streak</span>
+            </div>
+            <p className="text-xs text-muted-foreground">All habits completed</p>
+          </div>
         </div>
+        {overallStreak > 0 && (
+          <ShareButton type="streak" streak={overallStreak} variant="outline" size="sm" />
+        )}
       </div>
 
       {/* Individual habit streaks */}
