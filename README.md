@@ -1,4 +1,4 @@
-🎯 FocusFlow — Productivity & Habit Tracking App
+🎯 FocusFlow  Productivity & Habit Tracking App
 
 FocusFlow is a calm, mobile-first productivity app designed to help users stay focused, build habits, and track progress without distractions.
 It emphasizes clean UI, thoughtful UX, and scalable product architecture.
