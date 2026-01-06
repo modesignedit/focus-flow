@@ -1,73 +1,103 @@
-# Welcome to your Lovable project
+🎯 FocusFlow — Productivity & Habit Tracking App
 
-## Project info
+FocusFlow is a calm, mobile-first productivity app designed to help users stay focused, build habits, and track progress without distractions.
+It emphasizes clean UI, thoughtful UX, and scalable product architecture.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+🚀 Features
 
-## How can I edit this code?
+🔐 User authentication (signup & login)
 
-There are several ways of editing your application.
+🛡️ Protected user dashboard
 
-**Use Lovable**
+🎯 Create, edit, and delete daily focus goals or habits
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+⏱️ Built-in focus timer (Pomodoro-style)
 
-Changes made via Lovable will be committed automatically to this repo.
+📊 Daily and weekly progress tracking
 
-**Use your preferred IDE**
+📈 Visual progress indicators and stats
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+🌗 Dark / Light mode toggle
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+📱 Fully mobile-first and responsive
 
-Follow these steps:
+⚡ Scalable structure for future SaaS features
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+🧠 Product & UX Focus
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Calm, distraction-free interface
 
-# Step 3: Install the necessary dependencies.
-npm i
+Designed for consistent daily use
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+Mobile-first experience for Gen Z builders
 
-**Edit a file directly in GitHub**
+Clear progress feedback without overwhelm
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+UX decisions optimized for focus and clarity
 
-**Use GitHub Codespaces**
+🛠️ Built With
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Lovable.dev
 
-## What technologies are used for this project?
+JavaScript
 
-This project is built with:
+HTML & CSS
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Client-side state management
 
-## How can I deploy this project?
+UI animations and transitions
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+📸 Screenshots
 
-## Can I connect a custom domain to my Lovable project?
+Add screenshots showing:
 
-Yes, you can!
+Dashboard overview
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Habit / goal creation
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Focus timer
+
+Progress stats
+
+Mobile view
+
+Dark / Light mode
+
+🔗 Live Demo
+
+👉 Add your deployed app link here
+
+📂 How It Works
+
+Users sign up or log in
+
+Each user manages their own focus goals and habits
+
+Focus sessions are tracked using a built-in timer
+
+Progress is calculated daily and weekly
+
+Stats update dynamically based on user activity
+
+UI adapts seamlessly across devices
+
+🌱 Product Roadmap
+
+Streak tracking
+
+Daily reminders & notifications
+
+Focus session history
+
+Cloud sync
+
+Subscription plans (premium analytics, themes)
+
+👨‍💻 Author
+
+Moses Orji
+Vibe Coder | UI-First Full-Stack Builder
+
+GitHub: https://github.com/modesignedit
+
+LinkedIn: https://ng.linkedin.com/in/moses-orji-5553a8a9
