@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { HabitCard } from './HabitCard';
 import { HabitDialog } from './HabitDialog';
 import { CategoryFilter, HabitCategory } from './habits/HabitCategories';
@@ -9,7 +10,6 @@ import { useHabits, Habit } from '@/hooks/useHabits';
 import { useStreak } from '@/hooks/useStreak';
 import { useCelebration } from '@/hooks/useCelebration';
 import { useToast } from '@/hooks/use-toast';
-import { Confetti } from './celebrations/Confetti';
 
 // Main habit list component with create/edit functionality
 export function HabitList() {
@@ -162,20 +162,40 @@ export function HabitList() {
         </div>
       )}
 
-      {/* Habit cards */}
-      <div className="space-y-3">
-        {filteredHabits.map(habit => (
-          <HabitCard
-            key={habit.id}
-            habit={habit}
-            streak={getHabitStreak(habit.id)}
-            onToggle={() => handleToggle(habit.id)}
-            onEdit={() => openEditDialog(habit)}
-            onDelete={() => handleDelete(habit.id)}
-            onCelebrate={() => celebrate({ sound: 'complete' })}
-          />
-        ))}
-      </div>
+      {/* Habit cards with smart scroll */}
+      {filteredHabits.length > 0 && (
+        filteredHabits.length > 4 ? (
+          <ScrollArea className="h-[400px] pr-3">
+            <div className="space-y-3 pb-2">
+              {filteredHabits.map(habit => (
+                <HabitCard
+                  key={habit.id}
+                  habit={habit}
+                  streak={getHabitStreak(habit.id)}
+                  onToggle={() => handleToggle(habit.id)}
+                  onEdit={() => openEditDialog(habit)}
+                  onDelete={() => handleDelete(habit.id)}
+                  onCelebrate={() => celebrate({ sound: 'complete' })}
+                />
+              ))}
+            </div>
+          </ScrollArea>
+        ) : (
+          <div className="space-y-3">
+            {filteredHabits.map(habit => (
+              <HabitCard
+                key={habit.id}
+                habit={habit}
+                streak={getHabitStreak(habit.id)}
+                onToggle={() => handleToggle(habit.id)}
+                onEdit={() => openEditDialog(habit)}
+                onDelete={() => handleDelete(habit.id)}
+                onCelebrate={() => celebrate({ sound: 'complete' })}
+              />
+            ))}
+          </div>
+        )
+      )}
 
       {/* Create/Edit dialog */}
       <HabitDialog
