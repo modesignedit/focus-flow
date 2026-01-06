@@ -18,6 +18,9 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useToast } from '@/hooks/use-toast';
+import { MotivationalQuote } from '@/components/auth/MotivationalQuote';
+import { AuthIllustration } from '@/components/auth/AuthIllustration';
+import { SocialProof } from '@/components/auth/SocialProof';
 
 // Validation schemas for login and signup
 const loginSchema = z.object({
@@ -121,6 +124,9 @@ export default function Auth() {
       {/* Main content */}
       <main className="flex-1 flex items-center justify-center p-4">
         <Card className="w-full max-w-sm p-6 sm:p-8 animate-scale-in">
+          {/* Animated illustration */}
+          <AuthIllustration />
+          
           {/* Welcome text */}
           <div className="text-center mb-6">
             <h1 className="text-2xl font-semibold mb-2">
@@ -226,12 +232,15 @@ export default function Auth() {
               {isLogin ? 'Sign up' : 'Sign in'}
             </button>
           </div>
+
+          {/* Social proof */}
+          <SocialProof />
         </Card>
       </main>
 
-      {/* Footer */}
-      <footer className="p-4 text-center text-xs text-muted-foreground">
-        Build better habits, one day at a time
+      {/* Rotating quote footer */}
+      <footer className="p-4">
+        <MotivationalQuote />
       </footer>
     </div>
   );
