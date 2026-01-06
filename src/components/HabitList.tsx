@@ -4,11 +4,16 @@ import { Button } from '@/components/ui/button';
 import { HabitCard } from './HabitCard';
 import { HabitDialog } from './HabitDialog';
 import { useHabits, Habit } from '@/hooks/useHabits';
+import { useStreak } from '@/hooks/useStreak';
+import { useCelebration } from '@/hooks/useCelebration';
 import { useToast } from '@/hooks/use-toast';
+import { Confetti } from './celebrations/Confetti';
 
 // Main habit list component with create/edit functionality
 export function HabitList() {
   const { habits, loading, createHabit, updateHabit, deleteHabit, toggleCompletion } = useHabits();
+  const { getHabitStreak } = useStreak(habits);
+  const { showConfetti, celebrate, soundEnabled } = useCelebration();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
@@ -121,9 +126,11 @@ export function HabitList() {
           <HabitCard
             key={habit.id}
             habit={habit}
+            streak={getHabitStreak(habit.id)}
             onToggle={() => handleToggle(habit.id)}
             onEdit={() => openEditDialog(habit)}
             onDelete={() => handleDelete(habit.id)}
+            onCelebrate={() => celebrate({ sound: 'complete' })}
           />
         ))}
       </div>
