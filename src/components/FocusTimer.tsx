@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useFocusTimer } from '@/hooks/useFocusTimer';
 import { cn } from '@/lib/utils';
+import { BreathingAnimation } from './timer/BreathingAnimation';
+import { AmbientSoundButton } from './timer/AmbientSoundButton';
 
 // Pomodoro-style focus timer with circular progress
 export function FocusTimer() {
@@ -26,7 +28,11 @@ export function FocusTimer() {
   }
 
   return (
-    <Card className="p-6 sm:p-8 glass animate-fade-in">
+    <Card className="p-6 sm:p-8 glass animate-fade-in relative overflow-hidden">
+      {/* Ambient sound button in top right */}
+      <div className="absolute top-4 right-4 z-10">
+        <AmbientSoundButton isTimerRunning={state === 'running'} />
+      </div>
       {/* Duration selector (only when idle) */}
       {state === 'idle' && (
         <div className="flex justify-center gap-2 mb-6">
@@ -49,6 +55,9 @@ export function FocusTimer() {
 
       {/* Circular timer display */}
       <div className="relative mx-auto w-48 h-48 sm:w-64 sm:h-64 mb-6">
+        {/* Breathing animation for break state */}
+        <BreathingAnimation isActive={state === 'break'} />
+        
         {/* Background circle */}
         <svg className="w-full h-full transform -rotate-90">
           <circle
@@ -85,7 +94,7 @@ export function FocusTimer() {
             {timeDisplay}
           </span>
           <span className="text-xs text-muted-foreground mt-2 uppercase tracking-widest">
-            {state === 'idle' ? 'Ready' : state === 'paused' ? 'Paused' : 'Focus'}
+            {state === 'idle' ? 'Ready' : state === 'paused' ? 'Paused' : state === 'break' ? 'Breathe' : 'Focus'}
           </span>
         </div>
       </div>
