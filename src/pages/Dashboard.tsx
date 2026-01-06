@@ -6,6 +6,7 @@ import { WeeklyChart } from '@/components/WeeklyChart';
 import { FocusHistory } from '@/components/FocusHistory';
 import { StreakDisplay } from '@/components/StreakDisplay';
 import { ReminderSettings } from '@/components/ReminderSettings';
+import { ProgressReports } from '@/components/reports/ProgressReports';
 import { OnboardingFlow } from '@/components/onboarding/OnboardingFlow';
 import { AchievementsButton, AchievementsPanel } from '@/components/achievements/AchievementsPanel';
 import { AchievementNotification } from '@/components/achievements/AchievementNotification';
@@ -88,6 +89,11 @@ export default function Dashboard() {
         <section className="grid sm:grid-cols-2 gap-4">
           <StreakDisplay />
           <ReminderSettings />
+        </section>
+
+        {/* Progress Reports */}
+        <section>
+          <ProgressReports />
         </section>
 
         {/* Weekly progress chart */}

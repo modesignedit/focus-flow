@@ -3,12 +3,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { format, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
 
+import { HabitCategory } from '@/components/habits/HabitCategories';
+
 // Habit type definitions
 export interface Habit {
   id: string;
   title: string;
   description: string | null;
   color: string;
+  category: HabitCategory;
   target_per_day: number;
   created_at: string;
 }
@@ -73,6 +76,7 @@ export function useHabits() {
 
         return {
           ...habit,
+          category: (habit.category || 'personal') as HabitCategory,
           completions: habitCompletions,
           todayCount: todayCompletion?.count || 0,
           weeklyCount
@@ -94,7 +98,7 @@ export function useHabits() {
   }, [fetchHabits]);
 
   // Create a new habit
-  const createHabit = async (title: string, description?: string, color?: string) => {
+  const createHabit = async (title: string, description?: string, color?: string, category?: HabitCategory) => {
     if (!user) return { error: 'Not authenticated' };
 
     const { error } = await supabase
@@ -103,7 +107,8 @@ export function useHabits() {
         user_id: user.id,
         title,
         description: description || null,
-        color: color || '#8B5CF6'
+        color: color || '#8B5CF6',
+        category: category || 'personal'
       });
 
     if (error) {
