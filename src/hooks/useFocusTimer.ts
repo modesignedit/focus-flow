@@ -15,6 +15,8 @@ interface FocusSession {
 
 export function useFocusTimer(defaultMinutes = 25) {
   const { user } = useAuth();
+  const [focusDuration, setFocusDuration] = useState(defaultMinutes);
+  const [breakDuration, setBreakDuration] = useState(5);
   const [minutes, setMinutes] = useState(defaultMinutes);
   const [seconds, setSeconds] = useState(0);
   const [state, setState] = useState<TimerState>('idle');
@@ -22,9 +24,12 @@ export function useFocusTimer(defaultMinutes = 25) {
   const [todaySessions, setTodaySessions] = useState<FocusSession[]>([]);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Current duration based on state
+  const currentDuration = state === 'break' ? breakDuration : focusDuration;
+  
   // Total seconds remaining
   const totalSeconds = minutes * 60 + seconds;
-  const progress = ((defaultMinutes * 60 - totalSeconds) / (defaultMinutes * 60)) * 100;
+  const progress = ((currentDuration * 60 - totalSeconds) / (currentDuration * 60)) * 100;
 
   // Fetch today's completed sessions
   const fetchTodaySessions = useCallback(async () => {
@@ -48,9 +53,55 @@ export function useFocusTimer(defaultMinutes = 25) {
     fetchTodaySessions();
   }, [fetchTodaySessions]);
 
+  // Handle timer completion
+  const handleComplete = useCallback(async () => {
+    const wasBreak = state === 'break';
+    
+    if (!wasBreak) {
+      // Focus session complete - mark in database and start break
+      if (sessionId && user) {
+        await supabase
+          .from('focus_sessions')
+          .update({
+            completed: true,
+            completed_at: new Date().toISOString()
+          })
+          .eq('id', sessionId);
+
+        await fetchTodaySessions();
+      }
+
+      // Play notification
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('Focus session complete! 🎉', {
+          body: `Great work! Take a ${breakDuration} minute break.`,
+          icon: '/favicon.ico'
+        });
+      }
+
+      // Auto-start break
+      setSessionId(null);
+      setMinutes(breakDuration);
+      setSeconds(0);
+      setState('break');
+    } else {
+      // Break complete - return to idle
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('Break over! ⏰', {
+          body: 'Ready for another focus session?',
+          icon: '/favicon.ico'
+        });
+      }
+
+      setState('idle');
+      setMinutes(focusDuration);
+      setSeconds(0);
+    }
+  }, [state, sessionId, user, breakDuration, focusDuration, fetchTodaySessions]);
+
   // Timer tick logic
   useEffect(() => {
-    if (state === 'running') {
+    if (state === 'running' || state === 'break') {
       intervalRef.current = setInterval(() => {
         setSeconds(prev => {
           if (prev === 0) {
@@ -77,37 +128,7 @@ export function useFocusTimer(defaultMinutes = 25) {
         clearInterval(intervalRef.current);
       }
     };
-  }, [state, minutes]);
-
-  // Handle timer completion
-  const handleComplete = async () => {
-    setState('idle');
-    
-    // Mark session as complete in database
-    if (sessionId && user) {
-      await supabase
-        .from('focus_sessions')
-        .update({
-          completed: true,
-          completed_at: new Date().toISOString()
-        })
-        .eq('id', sessionId);
-
-      await fetchTodaySessions();
-    }
-
-    // Play notification sound (browser API)
-    if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification('Focus session complete! 🎉', {
-        body: 'Great work! Take a short break.',
-        icon: '/favicon.ico'
-      });
-    }
-
-    setSessionId(null);
-    setMinutes(defaultMinutes);
-    setSeconds(0);
-  };
+  }, [state, minutes, handleComplete]);
 
   // Start the timer
   const start = async () => {
@@ -118,7 +139,7 @@ export function useFocusTimer(defaultMinutes = 25) {
           .from('focus_sessions')
           .insert({
             user_id: user.id,
-            duration_minutes: defaultMinutes,
+            duration_minutes: focusDuration,
             completed: false
           })
           .select()
@@ -134,18 +155,22 @@ export function useFocusTimer(defaultMinutes = 25) {
 
   // Pause the timer
   const pause = () => {
-    setState('paused');
+    if (state === 'running') {
+      setState('paused');
+    }
   };
 
   // Resume the timer
   const resume = () => {
-    setState('running');
+    if (state === 'paused') {
+      setState('running');
+    }
   };
 
   // Reset the timer
   const reset = async () => {
     setState('idle');
-    setMinutes(defaultMinutes);
+    setMinutes(focusDuration);
     setSeconds(0);
     
     // Delete incomplete session
@@ -159,9 +184,27 @@ export function useFocusTimer(defaultMinutes = 25) {
     setSessionId(null);
   };
 
-  // Skip to break (marks session as incomplete)
-  const skip = async () => {
-    await reset();
+  // Skip break
+  const skipBreak = () => {
+    if (state === 'break') {
+      setState('idle');
+      setMinutes(focusDuration);
+      setSeconds(0);
+    }
+  };
+
+  // Set focus duration (only when idle)
+  const setDuration = (mins: number) => {
+    if (state === 'idle') {
+      setFocusDuration(mins);
+      setMinutes(mins);
+      setSeconds(0);
+    }
+  };
+
+  // Set break duration
+  const setBreak = (mins: number) => {
+    setBreakDuration(mins);
   };
 
   // Format time display
@@ -178,16 +221,14 @@ export function useFocusTimer(defaultMinutes = 25) {
     timeDisplay,
     todaySessions,
     todayFocusMinutes,
+    focusDuration,
+    breakDuration,
     start,
     pause,
     resume,
     reset,
-    skip,
-    setDuration: (mins: number) => {
-      if (state === 'idle') {
-        setMinutes(mins);
-        setSeconds(0);
-      }
-    }
+    skipBreak,
+    setDuration,
+    setBreakDuration: setBreak,
   };
 }

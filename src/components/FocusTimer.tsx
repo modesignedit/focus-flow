@@ -5,6 +5,7 @@ import { useFocusTimer } from '@/hooks/useFocusTimer';
 import { cn } from '@/lib/utils';
 import { BreathingAnimation } from './timer/BreathingAnimation';
 import { AmbientSoundButton } from './timer/AmbientSoundButton';
+import { BreakControls } from './timer/BreakControls';
 
 // Pomodoro-style focus timer with circular progress
 export function FocusTimer() {
@@ -13,11 +14,15 @@ export function FocusTimer() {
     progress,
     timeDisplay,
     todayFocusMinutes,
+    focusDuration,
+    breakDuration,
     start,
     pause,
     resume,
     reset,
-    setDuration
+    skipBreak,
+    setDuration,
+    setBreakDuration
   } = useFocusTimer(25);
 
   const durations = [15, 25, 45, 60];
@@ -27,36 +32,62 @@ export function FocusTimer() {
     Notification.requestPermission();
   }
 
+  const isBreak = state === 'break';
+
   return (
-    <Card className="p-6 sm:p-8 glass animate-fade-in relative overflow-hidden">
+    <Card className={cn(
+      "p-6 sm:p-8 glass animate-fade-in relative overflow-hidden transition-colors duration-500",
+      isBreak && "bg-primary/5 border-primary/20"
+    )}>
       {/* Ambient sound button in top right */}
       <div className="absolute top-4 right-4 z-10">
-        <AmbientSoundButton isTimerRunning={state === 'running'} />
+        <AmbientSoundButton isTimerRunning={state === 'running' || state === 'break'} />
       </div>
+
       {/* Duration selector (only when idle) */}
       {state === 'idle' && (
-        <div className="flex justify-center gap-2 mb-6">
-          {durations.map((mins) => (
-            <Button
-              key={mins}
-              variant="ghost"
-              size="sm"
-              onClick={() => setDuration(mins)}
-              className={cn(
-                "text-xs font-medium transition-all",
-                timeDisplay === `${String(mins).padStart(2, '0')}:00` && "bg-primary text-primary-foreground"
-              )}
-            >
-              {mins}m
-            </Button>
-          ))}
+        <div className="space-y-2 mb-6">
+          <div className="flex justify-center gap-2">
+            {durations.map((mins) => (
+              <Button
+                key={mins}
+                variant="ghost"
+                size="sm"
+                onClick={() => setDuration(mins)}
+                className={cn(
+                  "text-xs font-medium transition-all",
+                  focusDuration === mins && "bg-primary text-primary-foreground"
+                )}
+              >
+                {mins}m
+              </Button>
+            ))}
+          </div>
+          
+          {/* Break duration controls */}
+          <BreakControls
+            breakDuration={breakDuration}
+            onSetBreakDuration={setBreakDuration}
+            isBreakActive={false}
+            onSkipBreak={skipBreak}
+          />
+        </div>
+      )}
+
+      {/* Break mode header */}
+      {isBreak && (
+        <div className="text-center mb-4">
+          <span className="inline-flex items-center gap-2 text-sm text-primary font-medium px-3 py-1 bg-primary/10 rounded-full">
+            <Coffee className="h-4 w-4" />
+            Break Time
+          </span>
         </div>
       )}
 
       {/* Circular timer display */}
       <div className="relative mx-auto w-48 h-48 sm:w-64 sm:h-64 mb-6">
         {/* Breathing animation for break state */}
-        <BreathingAnimation isActive={state === 'break'} />
+        <BreathingAnimation isActive={isBreak} />
         
         {/* Background circle */}
         <svg className="w-full h-full transform -rotate-90">
@@ -74,7 +105,7 @@ export function FocusTimer() {
             cy="50%"
             r="45%"
             fill="none"
-            stroke={state === 'running' ? 'hsl(var(--timer-active))' : 'hsl(var(--muted-foreground))'}
+            stroke={isBreak ? 'hsl(var(--primary))' : state === 'running' ? 'hsl(var(--timer-active))' : 'hsl(var(--muted-foreground))'}
             strokeWidth="8"
             strokeLinecap="round"
             strokeDasharray={`${2 * Math.PI * 45}`}
@@ -88,7 +119,7 @@ export function FocusTimer() {
           <span 
             className={cn(
               "text-4xl sm:text-5xl font-light tracking-wider transition-all",
-              state === 'running' && "animate-timer-tick"
+              (state === 'running' || state === 'break') && "animate-timer-tick"
             )}
           >
             {timeDisplay}
@@ -130,6 +161,12 @@ export function FocusTimer() {
               <RotateCcw className="h-4 w-4" />
             </Button>
           </>
+        )}
+
+        {state === 'break' && (
+          <Button onClick={skipBreak} variant="outline" size="lg" className="gap-2">
+            Skip Break
+          </Button>
         )}
       </div>
 
